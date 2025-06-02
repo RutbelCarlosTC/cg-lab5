@@ -7,7 +7,7 @@ public class CameraRotator : MonoBehaviour
     public Transform player;           // Referencia al jugador
     public Transform[] spawnPoints;    // 0 = Area_0, 1 = Area_90, etc.
     public GameObject[] areas;         // Tilemaps de cada zona
-    public float rotationDuration = 0.3f;
+    public float rotationDuration = 0.3f; 
 
     private int currentZone = 0;
     public int currentAngle = 0;
