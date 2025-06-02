@@ -1,36 +1,65 @@
+using System.Collections;
 using UnityEngine;
 
-public class CameraRotationFEZ : MonoBehaviour
+public class CameraRotator : MonoBehaviour
 {
-    public Transform cameraPivot;  // El objeto vacío que rota
-    public float rotationSpeed = 300f;
-    private bool isRotating = false;
-    private Quaternion targetRotation;
+    public Transform cameraPivot;      // El objeto padre de la cámara (CameraPivot)
+    public Transform player;           // Referencia al jugador
+    public Transform[] spawnPoints;    // 0 = Area_0, 1 = Area_90, etc.
+    public GameObject[] areas;         // Tilemaps de cada zona
+    public float rotationDuration = 0.3f;
 
-    void Update()
+    private int currentZone = 0;
+    public int currentAngle = 0;
+    private bool rotating = false;
+
+    void Start()
     {
-        if (isRotating)
-        {
-            cameraPivot.rotation = Quaternion.RotateTowards(cameraPivot.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-            if (Quaternion.Angle(cameraPivot.rotation, targetRotation) < 0.1f)
-            {
-                cameraPivot.rotation = targetRotation;
-                isRotating = false;
-            }
-            return;
-        }
+        // Inicializar
+        player.position = spawnPoints[currentZone].position;
 
-        if (Input.GetKeyDown(KeyCode.Q))
-            RotateCamera(-90);
-        if (Input.GetKeyDown(KeyCode.E))
-            RotateCamera(90);
+        for (int i = 0; i < areas.Length; i++)
+            areas[i].SetActive(i == currentZone);
+
+        cameraPivot.rotation = Quaternion.Euler(0, currentZone * 180, 0);
+    }
+    public void RotateToNextZone()
+    {
+        if (!rotating)
+        {
+            int newZone = 1 - currentZone; // Alternar entre 0 y 1
+            int targetAngle = newZone * 180; // 0 o 180
+            StartCoroutine(RotateAndTeleport(targetAngle, newZone));
+        }
     }
 
-    void RotateCamera(float angle)
+    IEnumerator RotateAndTeleport(int angle, int zoneIndex)
     {
-        if (isRotating) return;
+        rotating = true;
 
-        targetRotation = cameraPivot.rotation * Quaternion.Euler(0, angle, 0);
-        isRotating = true;
+        Quaternion startRot = cameraPivot.rotation;
+        Quaternion endRot = Quaternion.Euler(0, angle, 0);
+
+        float elapsed = 0f;
+        while (elapsed < rotationDuration)
+        {
+            cameraPivot.rotation = Quaternion.Slerp(startRot, endRot, elapsed / rotationDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        cameraPivot.rotation = endRot;
+
+        // Teletransportar jugador
+        player.position = spawnPoints[zoneIndex].position;
+
+        // Activar solo la zona correspondiente
+        for (int i = 0; i < areas.Length; i++)
+        {
+            areas[i].SetActive(i == zoneIndex);
+        }
+
+        currentZone = zoneIndex;
+        rotating = false;
     }
 }
