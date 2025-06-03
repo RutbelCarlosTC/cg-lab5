@@ -56,14 +56,17 @@ public class MovimientoPersonaje : MonoBehaviour
 
     }
     public void Muerte()
-    {        
+    {
         muerte = true;
-        animator.SetBool("Da�o", muerte);
+        animator.SetBool("Daño", muerte);
 
     }
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * longitud);
+    }
+    void OnCollisionEnter2D(Collision2D collision){
+    Debug.Log("Colisionó con: " + collision.gameObject.name);
     }
 }

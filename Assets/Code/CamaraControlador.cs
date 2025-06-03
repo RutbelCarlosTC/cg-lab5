@@ -12,10 +12,10 @@ public class CamaraControlador : MonoBehaviour
     // Update is called once per frame
     public void LateUpdate()
     {
-        Vector3 PosiciónDeseada = objetivo.position + desplazamiento;
+        Vector3 PosicionDeseada = objetivo.position + desplazamiento;
 
-        Vector3 PosiciónSuavizada = Vector3.Lerp(transform.position, PosiciónDeseada, velocidadCamara);
+        Vector3 PosicionSuavizada = Vector3.Lerp(transform.position, PosicionDeseada, velocidadCamara);
 
-        transform.position = PosiciónSuavizada;
+        transform.position = PosicionSuavizada;
     }
 }
